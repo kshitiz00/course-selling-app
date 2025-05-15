@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserModel } from "../db.js";
+import { CourseModel, PurchaseModel, UserModel } from "../db.js";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -87,10 +87,30 @@ userRouter.post("/signin", async (req, res) => {
   }
 });
 
-userRouter.get("/purchases", userMidleware, (req, res) => {
-  res.json({
-    message: req.id,
-  });
+userRouter.get("/purchases", userMidleware, async (req, res) => {
+  try {
+    const userid = req.id;
+    const purchases = await PurchaseModel.find({
+      userid: userid,
+    });
+    if (purchases.length > 0) {
+      const courses = await CourseModel.find({
+        _id: { $in: purchases.map((x) => x.courseid) },
+      });
+      res.json({
+        purchases: purchases,
+        courses: courses,
+      });
+    } else {
+      res.json({
+        message: "No purchase",
+      });
+    }
+  } catch (e) {
+    res.json({
+      message: "Something went wrong",
+    });
+  }
 });
 
 export { userRouter };

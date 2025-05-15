@@ -121,10 +121,40 @@ adminRouter.post("/course", adminMiddleware, async (req, res) => {
   }
 });
 
-adminRouter.put("/course", adminMiddleware, (req, res) => {
-  res.json({
-    message: "Signin endpoint",
-  });
+adminRouter.put("/course", adminMiddleware, async (req, res) => {
+  try {
+    const adminId = req.id;
+    const { title, description, price, imageurl, courseid } = req.body;
+    const course = await CourseModel.findOne({
+      _id: courseid,
+      creatorid: adminId,
+    });
+    if (course) {
+      await CourseModel.updateOne(
+        {
+          _id: courseid,
+          creatorid: adminId,
+        },
+        {
+          title: title,
+          description: description,
+          price: price,
+          imageurl: imageurl,
+        }
+      );
+      res.json({
+        message: "Course Updated",
+      });
+    } else {
+      res.json({
+        message: "Course Not Found",
+      });
+    }
+  } catch (error) {
+    res.json({
+      message: "Something went wrong",
+    });
+  }
 });
 
 adminRouter.get("/bulk", adminMiddleware, async (req, res) => {
