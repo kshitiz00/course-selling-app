@@ -1,12 +1,10 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-
+import dotenv from "dotenv";
 const ObjectId = mongoose.Types.ObjectId;
-
+dotenv.config();
 mongoose
-  .connect(
-    "mongodb+srv://admin:Kshitiz%401619@cluster0.jgynvc4.mongodb.net/course-selling-database"
-  )
+  .connect(process.env.MONGO_URL)
   .then(() => {
     console.log("Database Connected");
   })
